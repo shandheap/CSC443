@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
+#include <string.h>
 #include <vector>
 
 #define MAX_CHARS_PER_LINE 32
@@ -12,31 +12,19 @@ typedef struct record {
     int uid2;
 } Record;
 
-/* Parse a given line to extract ids and return vector of ids (strings) */
-vector<string> parse_line(char line[]) {    
-    vector<string> parsed; 
-    string buf;
- 
-    /* Parse characters to get ids */
-    for (int i=0; i < MAX_CHARS_PER_LINE; i++) {
-        if (line[i] == '\r' || line[i] == '\n') {
-            string *id2 = new string(buf);
-            parsed.push_back(*id2);
-            buf.clear();
-            break;
-        }
+/* Parse a given line to extract ids and return a Record instance */
+Record * parse_line(char line[]) {
+    /* Use strtok with delimiters to get ids */
+    char * s1 = strtok(line, ",");
+    int shift = strlen(s1) + 1;
+    char * s2 = strtok(line + shift, "\r\n");
 
-        if (line[i] == ',') {
-            string *id1 = new string(buf);
-            parsed.push_back(*id1);
-            buf.clear();
-            continue;
-        }
+    /* Allocate new record on heap */
+    Record * r = (Record *)  malloc(sizeof(Record));
+    r->uid1 = atoi(s1);
+    r->uid2 = atoi(s2);
 
-        buf += line[i];
-    }
-    
-    return parsed;
+    return r;
 }
 
 
@@ -55,14 +43,9 @@ int main() {
     /* Read lines and store ids into records array */
     vector<Record> records;
     while (fgets(cur_line, MAX_CHARS_PER_LINE, fp_read) != NULL) {
-        vector<string> parsed = parse_line(cur_line);
-
-        Record *cur_record = (Record *) malloc(sizeof(Record));
-        cur_record->uid1 = atoi(parsed[0].c_str());
-        cur_record->uid2 = atoi(parsed[1].c_str());
-
-        records.push_back(*cur_record);
-        parsed.clear();
+        Record * r = parse_line(cur_line);
+        records.push_back(*r);
+        free(r);
     }
 
     fclose(fp_read);

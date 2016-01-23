@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Compiled files
+write_blocks
+max_ave_seq_disk
