@@ -50,25 +50,29 @@ int main() {
 
     fclose(fp_read);
 
-    /* Allocate buffer for 1 block */
     char output_filename[] = "records.dat";
 
-    /* Write records as blocks to disk */
     int block_size = 1024 * 1024;
-    int records_per_block = 1;
-    int total_records = records.size();
+    int record_size = (int) sizeof(Record);
+    int arr_size = records.size() * record_size;
+    block_size += block_size % record_size;
+    int records_per_block = block_size / record_size;
+    int num_of_blocks = arr_size / block_size;
+    
     FILE *fp_write;
-
-    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
     if ( !(fp_write = fopen(output_filename, "wb")) ) {
         printf("Could not open file %s for writing.\n", output_filename);
         return -1;
     }
 
-    fwrite(buffer, sizeof(Record), total_records, fp_write);
-    fflush(fp_write);
+    /* Write pages to disk as blocks */
+    for (int i=0; i < num_of_blocks; i++) {
+        int shift = i * records_per_block;
+        fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
+        fflush(fp_write);
+    } 
+    
     fclose(fp_write);
-    free(buffer);
-
+    
     return 0;
 }
