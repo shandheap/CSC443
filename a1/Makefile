@@ -1,6 +1,6 @@
 CC = g++
 
-all: write_blocks max_ave_seq_disk ...
+all: write_blocks max_ave_seq_disk
 library.o: library.cc library.h
 	$(CC) -o library.o -c library.cc
 
