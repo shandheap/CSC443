@@ -28,15 +28,18 @@ Record * parse_line(char line[]) {
 }
 
 
-int main() {
-    char file_name[] = "data/g_plusAnonymized.csv";
-
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Error: Enter the input filename and the block size as arguments\n");
+        return -1;
+    }
+    
     char cur_line[MAX_CHARS_PER_LINE];
     FILE *fp_read;
 
     /* Open file for reading */
-    if ( !(fp_read = fopen(file_name, "r")) ) {
-        printf("Could not open file %s for reading.\n", file_name);
+    if ( !(fp_read = fopen(argv[1], "r")) ) {
+        printf("Could not open file %s for reading.\n", argv[1]);
         return -1;
     }
 
@@ -52,7 +55,7 @@ int main() {
 
     char output_filename[] = "records.dat";
 
-    int block_size = 1024 * 1024;
+    int block_size = atoi(argv[2]);
     int record_size = (int) sizeof(Record);
     int arr_size = records.size() * record_size;
     block_size += block_size % record_size;
