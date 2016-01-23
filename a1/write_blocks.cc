@@ -56,10 +56,9 @@ int main(int argc, char *argv[]) {
     char output_filename[] = "records.dat";
 
     int block_size = atoi(argv[2]);
-    int record_size = (int) sizeof(Record);
-    int arr_size = records.size() * record_size;
-    block_size += block_size % record_size;
-    int records_per_block = block_size / record_size;
+    int arr_size = records.size() * sizeof(Record);
+    block_size += block_size % sizeof(Record);
+    int records_per_block = block_size / sizeof(Record);
     int num_of_blocks = arr_size / block_size;
     
     FILE *fp_write;
@@ -76,6 +75,32 @@ int main(int argc, char *argv[]) {
     } 
     
     fclose(fp_write);
-    
+   
+    /* Test if array was written to disk properly */
+    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
+    if ( !(fp_read = fopen(output_filename, "rb")) ) {
+        printf("Could not open file %s for reading.\n", output_filename);
+        return -1;
+    }
+
+    /* Read pages from disk as blocks */
+    for (int i=0; i < num_of_blocks; i++) {
+        int shift = i * records_per_block;
+        fread(buffer, sizeof(Record), records_per_block, fp_read);
+
+        for (int j=0; j < records_per_block; j++) {
+            if (buffer[j].uid1 != records[shift+j].uid1 ||
+                buffer[j].uid2 != records[shift+j].uid2) {
+                printf("Error: Binary dat records do not match original.\n");
+                return -1;
+            }
+        }
+    }
+
+    fclose(fp_read);
+    free(buffer);
+
+    printf("Success: Binary dat on disk matches original.\n");
+
     return 0;
 }
