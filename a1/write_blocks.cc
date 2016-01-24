@@ -57,9 +57,10 @@ int main(int argc, char *argv[]) {
 
     char output_filename[] = "records.dat";
 
-    int block_size = atoi(argv[2]);
+    long block_size = atol(argv[2]);
     int arr_size = records.size() * sizeof(Record);
     block_size += block_size % sizeof(Record);
+    block_size = (block_size > arr_size) ? arr_size : block_size;
     int records_per_block = block_size / sizeof(Record);
     int num_of_blocks = arr_size / block_size;
     
