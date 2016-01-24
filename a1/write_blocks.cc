@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include <time.h>
+
 
 #define MAX_CHARS_PER_LINE 32
 
@@ -68,22 +70,33 @@ int main(int argc, char *argv[]) {
     }
 
     /* Write pages to disk as blocks */
+    clock_t begin, end;
+    double time_elapsed, processing_rate;
+    
+    begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
         int shift = i * records_per_block;
         fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
         fflush(fp_write);
-    } 
+    }
+    end = clock();
     
+    /* Output processing rate */
+    time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    processing_rate = (double) arr_size / (time_elapsed * 1000000);
+    printf("Data rate: %.3f MBPS\n", processing_rate);
+
     fclose(fp_write);
+
    
-    /* Test if array was written to disk properly */
+    /* Test if array was written to disk properly
     Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
     if ( !(fp_read = fopen(output_filename, "rb")) ) {
         printf("Could not open file %s for reading.\n", output_filename);
         return -1;
-    }
+    } */
 
-    /* Read pages from disk as blocks */
+    /* Read pages from disk as blocks
     for (int i=0; i < num_of_blocks; i++) {
         int shift = i * records_per_block;
         fread(buffer, sizeof(Record), records_per_block, fp_read);
@@ -98,9 +111,7 @@ int main(int argc, char *argv[]) {
     }
 
     fclose(fp_read);
-    free(buffer);
-
-    printf("Success: Binary dat on disk matches original.\n");
+    free(buffer);*/
 
     return 0;
 }
