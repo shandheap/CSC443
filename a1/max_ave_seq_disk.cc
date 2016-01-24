@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <map>
 
 typedef struct record {
     int uid1;
     int uid2;
 } Record;
 
+using namespace std;
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -41,14 +42,40 @@ int main(int argc, char *argv[]) {
     /* Calculate the filesize */
     fseek(fp_read, 0L, SEEK_END);
     long filesize = ftell(fp_read);
+    fseek(fp_read, 0L, SEEK_SET);
+
     block_size = (block_size > filesize) ? filesize : block_size;
+    int num_of_blocks = filesize / block_size;
+
+    /* Use map to track user follower count */
+    map<int, int> users;
+    int max_count = 0;
 
     /* Read binary file from disk */
     begin = clock();
-    for (int i=0; i < filesize / block_size; i++) {
+    for (int i=0; i < num_of_blocks; i++) {
         fread(buffer, sizeof(Record), records_per_block, fp_read);
+        
+        for (int j=0; j < records_per_block; j++) {
+            int uid1 = buffer[j].uid1;
+            if (users.find(uid1) == users.end()) {
+                users[uid1] = 1;
+            } else {
+                users[uid1]++;
+            }
+
+            if (max_count < users[uid1]) {
+                max_count = users[uid1];
+            }
+        }
     }
     end = clock();
+
+    /* Output max and average follower counts */
+    int num_records = filesize / sizeof(Record); 
+    double ave_count = (double) num_records / (double) users.size();
+    printf("Max follower count is %d.\n", max_count);
+    printf("Average follower count is %f.\n", ave_count);
 
     /* Output processing rate */
     time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
