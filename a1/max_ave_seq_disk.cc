@@ -21,11 +21,11 @@ int main(int argc, char *argv[]) {
 
     /* Open file for reading */
     if ( !(fp_read = fopen(filename, "r")) ) {
-        printf("Could not open file %s for reading.\n", argv[1]);
+        printf("Could not open file %s for reading.\n", filename);
         return -1;
     }
 
-    long block_size = atol(argv[2]);
+    long block_size = atol(argv[1]);
     block_size += block_size % sizeof(Record);
     int records_per_block = block_size / sizeof(Record);
 
