@@ -5,8 +5,6 @@
 
 #define MAX_CHARS_PER_LINE 32
 
-using namespace std;
-
 typedef struct record {
     int uid1;
     int uid2;
@@ -20,7 +18,7 @@ int main(int argc, char *argv[]) {
     
     char cur_line[MAX_CHARS_PER_LINE];
     FILE *fp_read;
-    char output_filename[] = "copy.txt";
+    char output_filename[] = "records.txt";
 	FILE *fp_write;
 
     /* Open file for reading */
@@ -41,10 +39,12 @@ int main(int argc, char *argv[]) {
     /* Read lines and write them immediate into another text file */
     while (fgets(cur_line, MAX_CHARS_PER_LINE, fp_read) != NULL) {
 		bytes_written += (double) strlen(cur_line) * sizeof(char);
+		
 		begin = clock();
 		fwrite(&cur_line, sizeof(char), strlen(cur_line), fp_write);
         fflush(fp_write);
         end = clock();
+        
         time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
     }
 
