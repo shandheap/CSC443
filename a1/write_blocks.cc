@@ -58,11 +58,13 @@ int main(int argc, char *argv[]) {
     char output_filename[] = "records.dat";
 
     long block_size = atol(argv[2]);
-    int arr_size = records.size() * sizeof(Record);
+    long arr_size = records.size() * sizeof(Record);
     block_size += block_size % sizeof(Record);
     block_size = (block_size > arr_size) ? arr_size : block_size;
-    int records_per_block = block_size / sizeof(Record);
-    int num_of_blocks = arr_size / block_size;
+    long records_per_block = (long) block_size / sizeof(Record);
+    long num_of_blocks = (long) arr_size / block_size;
+    
+    long rec_rem = records.size() % num_of_blocks;
     
     FILE *fp_write;
     if ( !(fp_write = fopen(output_filename, "wb")) ) {
@@ -76,21 +78,27 @@ int main(int argc, char *argv[]) {
     
     begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
-        int shift = i * records_per_block;
-        fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
-        fflush(fp_write);
+		int shift = i * records_per_block;
+		fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
+		fflush(fp_write);
     }
+    
+    if (rec_rem > 0) {
+		fwrite(&records[num_of_blocks * records_per_block], sizeof(Record), rec_rem, fp_write);
+		fflush(fp_write);
+	}
+    
     end = clock();
     
     /* Output processing rate */
     time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
     processing_rate = (double) arr_size / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
-
+	printf("Number of blocks: %li, Records per block: %li, Rem: %li\n", num_of_blocks, records_per_block, rec_rem);
     fclose(fp_write);
 
    
-    /* Test if array was written to disk properly
+    /*//Test if array was written to disk properly
     Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
     if ( !(fp_read = fopen(output_filename, "rb")) ) {
         printf("Could not open file %s for reading.\n", output_filename);

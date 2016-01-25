@@ -35,6 +35,6 @@ max_ave_seq_ram
 
 # Output files
 records.dat
-
+records.txt
 # Mac compiled files
 *.dSYM
