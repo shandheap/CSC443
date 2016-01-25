@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
     block_size = (block_size > arr_size) ? arr_size : block_size;
     long records_per_block = (long) block_size / sizeof(Record);
     long num_of_blocks = (long) arr_size / block_size;
-    
-    long rec_rem = records.size() % num_of_blocks;
+    // calculate the records remaining in the incomplete block
+    long rec_rem = records.size() - records_per_block * num_of_blocks;
     
     FILE *fp_write;
     if ( !(fp_write = fopen(output_filename, "wb")) ) {
@@ -75,7 +75,6 @@ int main(int argc, char *argv[]) {
     /* Write pages to disk as blocks */
     clock_t begin, end;
     double time_elapsed, processing_rate;
-    
     begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
 		int shift = i * records_per_block;
@@ -89,14 +88,12 @@ int main(int argc, char *argv[]) {
 	}
     
     end = clock();
-    
     /* Output processing rate */
     time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
     processing_rate = (double) arr_size / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
     fclose(fp_write);
 
-   
     /*//Test if array was written to disk properly
     Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
     if ( !(fp_read = fopen(output_filename, "rb")) ) {
