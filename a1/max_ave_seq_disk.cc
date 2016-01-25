@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     fseek(fp_read, 0L, SEEK_END);
     long filesize = ftell(fp_read);
     fseek(fp_read, 0L, SEEK_SET);
-
+	int num_records = filesize / sizeof(Record);
     block_size = (block_size > filesize) ? filesize : block_size;
     int num_of_blocks = filesize / block_size;
 
@@ -55,24 +55,31 @@ int main(int argc, char *argv[]) {
     begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
         fread(buffer, sizeof(Record), records_per_block, fp_read);
-        
         for (int j=0; j < records_per_block; j++) {
             int uid1 = buffer[j].uid1;
-            if (users.find(uid1) == users.end()) {
-                users[uid1] = 1;
-            } else {
-                users[uid1]++;
-            }
-
+			users[uid1]++;
             if (max_count < users[uid1]) {
                 max_count = users[uid1];
             }
         }
     }
+    
+    // read the remainder of the file(last remaining incomplete block)
+    int rec_rem = num_records - num_of_blocks * records_per_block;
+    if (rec_rem > 0) {
+		fread(buffer, sizeof(Record), rec_rem, fp_read);
+        for (int j=0; j < rec_rem; j++) {
+            int uid1 = buffer[j].uid1;
+			users[uid1]++;
+			// keep track of the maximum
+            if (max_count < users[uid1]) {
+                max_count = users[uid1];
+            }
+        }
+	}
     end = clock();
 
-    /* Output max and average follower counts */
-    int num_records = filesize / sizeof(Record); 
+    /* Output max and average follower counts */ 
     double ave_count = (double) num_records / (double) users.size();
     printf("Max follower count is %d.\n", max_count);
     printf("Average follower count is %f.\n", ave_count);
