@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
     time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
     processing_rate = (double) arr_size / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
-	printf("Number of blocks: %li, Records per block: %li, Rem: %li\n", num_of_blocks, records_per_block, rec_rem);
     fclose(fp_write);
 
    
