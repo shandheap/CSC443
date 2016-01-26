@@ -77,15 +77,15 @@ int main(int argc, char *argv[]) {
     double time_elapsed, processing_rate;
     begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
-		int shift = i * records_per_block;
-		fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
-		fflush(fp_write);
+        int shift = i * records_per_block;
+        fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
+        fflush(fp_write);
     }
     
     if (rec_rem > 0) {
-		fwrite(&records[num_of_blocks * records_per_block], sizeof(Record), rec_rem, fp_write);
-		fflush(fp_write);
-	}
+        fwrite(&records[num_of_blocks * records_per_block], sizeof(Record), rec_rem, fp_write);
+        fflush(fp_write);
+    }
     
     end = clock();
     /* Output processing rate */
