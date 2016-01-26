@@ -59,6 +59,9 @@ int main() {
     }
     end = clock();
 
+    /* Clear file from RAM */
+    munmap(mmap_ptr, filesize);
+
     /* Output max and average follower counts */ 
     double ave_count = (double) num_records / (double) users.size();
     printf("Max follower count is %d.\n", max_count);

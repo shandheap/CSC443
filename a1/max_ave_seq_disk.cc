@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     char filename[] = "records.dat";
 
     /* Open file for reading */
-    if ( !(fp_read = fopen(filename, "r")) ) {
+    if ( !(fp_read = fopen(filename, "rb")) ) {
         printf("Could not open file %s for reading.\n", filename);
         return -1;
     }
@@ -31,10 +31,6 @@ int main(int argc, char *argv[]) {
     int records_per_block = block_size / sizeof(Record);
 
     Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
-    if ( !(fp_read = fopen(filename, "rb")) ) {
-        printf("Could not open file %s for reading.\n", filename);
-        return -1;
-    }
 
     clock_t begin, end;
     double time_elapsed, processing_rate;
