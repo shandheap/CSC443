@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     for (int i=0; i < num_of_blocks; i++)
         rand_blocks[i] = i;
     srand(time(0));
-    random_shuffle(&rand_blocks[0], &rand_blocks[num_of_blocks-1]);
+    random_shuffle(&rand_blocks[0], &rand_blocks[num_of_blocks]);
 
 
     int records_per_block = block_size / sizeof(Record);
