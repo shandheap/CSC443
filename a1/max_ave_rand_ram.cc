@@ -52,7 +52,6 @@ int main(int argc, char *argv[]) {
 
 
     int records_per_block = block_size / sizeof(Record);
-    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
 
     int rec_rem = (filesize % block_size) / sizeof(Record);
     int rec_count = records_per_block;
@@ -105,7 +104,4 @@ int main(int argc, char *argv[]) {
     time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
     processing_rate = (double) filesize / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
-
-    fclose(fp_read);
-    free(buffer);
 }
