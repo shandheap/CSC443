@@ -70,6 +70,12 @@ int main(int argc, char *argv[]) {
     /* Close file stream */
     fclose(fp_read);
 
+    /* Warm up RAM cache with trial mmap traversal */
+    for (int i=0; i < num_records; i++) {
+        int uid1 = ((Record *) mmap_ptr + i) -> uid1;
+        int uid2 = ((Record *) mmap_ptr + i) -> uid2;
+    }
+
     /* Read binary records from RAM */
     begin = clock();
     for (int i=0; i < num_of_blocks; i++) {
