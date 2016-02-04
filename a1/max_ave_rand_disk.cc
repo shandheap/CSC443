@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     long block_size = atol(argv[1]);
-    block_size += block_size % sizeof(Record);
+    block_size -= block_size % sizeof(Record);
     
     /* Calculate the filesize */
     fseek(fp_read, 0L, SEEK_END);

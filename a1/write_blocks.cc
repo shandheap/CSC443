@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     long block_size = atol(argv[2]);
     long arr_size = records.size() * sizeof(Record);
-    block_size += block_size % sizeof(Record);
+    block_size -= block_size % sizeof(Record);
     block_size = (block_size > arr_size) ? arr_size : block_size;
     long records_per_block = (long) block_size / sizeof(Record);
     long num_of_blocks = (long) arr_size / block_size;

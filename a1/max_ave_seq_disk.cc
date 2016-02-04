@@ -28,10 +28,8 @@ int main(int argc, char *argv[]) {
     }
 
     long block_size = atol(argv[1]);
-    block_size += block_size % sizeof(Record);
-    int records_per_block = block_size / sizeof(Record);
-
-    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
+    block_size -= block_size % sizeof(Record);
+    
 
     clock_t begin, end;
     double time_elapsed, processing_rate;
@@ -42,7 +40,11 @@ int main(int argc, char *argv[]) {
     fseek(fp_read, 0L, SEEK_SET);
     int num_records = filesize / sizeof(Record);
     block_size = (block_size > filesize) ? filesize : block_size;
+    
     int num_of_blocks = ceil(filesize / double(block_size));
+    int records_per_block = block_size / sizeof(Record);
+
+    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
 
     /* Use map to track user follower count */
     map<int, int> users;
