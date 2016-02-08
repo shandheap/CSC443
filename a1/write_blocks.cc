@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-#include <time.h>
+#include <sys/time.h>
+#include <math.h>
 
 
 #define MAX_CHARS_PER_LINE 32
@@ -73,9 +74,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* Write pages to disk as blocks */
-    clock_t begin, end;
+    struct timeval start, end;
     double time_elapsed, processing_rate;
-    begin = clock();
+    
+    gettimeofday(&start, NULL);
     for (int i=0; i < num_of_blocks; i++) {
         int shift = i * records_per_block;
         fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
@@ -86,12 +88,12 @@ int main(int argc, char *argv[]) {
         fwrite(&records[num_of_blocks * records_per_block], sizeof(Record), rec_rem, fp_write);
         fflush(fp_write);
     }
-    
-    end = clock();
+    gettimeofday(&end, NULL);
+ 
     /* Output processing rate */
-    time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
-    processing_rate = (double) arr_size / (time_elapsed * 1000000);
-    printf("Data rate: %.3f MBPS\n", processing_rate);
+    time_elapsed = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1e6;
+    processing_rate = (double) arr_size / (time_elapsed * 1e6);
+    printf("Data rate: %.3f MBps\n", processing_rate);
     fclose(fp_write);
 
     /*//Test if array was written to disk properly

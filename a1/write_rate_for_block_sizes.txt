@@ -1,0 +1,11 @@
+Results
+=======
+512 Block size had a write rate of 128.905
+1024 Block size had a write rate of 223.803
+4096 Block size had a write rate of 302.780
+8192 Block size had a write rate of 249.022
+16384 Block size had a write rate of 269.558
+32768 Block size had a write rate of 286.074
+1048576 Block size had a write rate of 255.012
+2097152 Block size had a write rate of 266.719
+4194304 Block size had a write rate of 280.411

@@ -22,6 +22,9 @@ if __name__ == "__main__":
     rates = []
 
     for s in sizes:
+        # Clear page cache (Only for Mac)
+        subprocess.call(["purge"])
+
         # Program and args to pass to write_blocks
         cmd = ["./write_blocks", "g_plusAnonymized.csv",  str(s)]
 
@@ -30,6 +33,12 @@ if __name__ == "__main__":
         result = re.sub(r"Data rate: ", r"", result)
         data_rate = result.split(" ")[0]
         rates.append(float(data_rate))
+
+    print "Results"
+    print "======="
+    for i in xrange(len(sizes)):
+        fmt_str = "{0} Block size had a write rate of {1} MBps"
+        print fmt_str.format(sizes[i], rates[i])
 
     print "Data rates for specified sizes are as follows:"
     print rates

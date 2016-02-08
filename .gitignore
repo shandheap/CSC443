@@ -40,3 +40,4 @@ records.dat
 records.txt
 # Mac compiled files
 *.dSYM
+.DS_Store
