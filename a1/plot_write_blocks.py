@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-import subprocess
-import time
 import re
 
 
@@ -21,23 +19,18 @@ sizes = [
 if __name__ == "__main__":
     rates = []
 
-    for s in sizes:
-        # Clear page cache (Only for Mac)
-        subprocess.call(["purge"])
-
-        # Program and args to pass to write_blocks
-        cmd = ["./write_blocks", "g_plusAnonymized.csv",  str(s)]
-
-        # Parse data rate from output
-        result = subprocess.check_output(cmd)
-        result = re.sub(r"Data rate: ", r"", result)
-        data_rate = result.split(" ")[0]
-        rates.append(float(data_rate))
+    # Read output from bash
+    with open("write_blocks_timing.txt") as f:
+        lines = f.readlines()
+        for l in lines:
+            l = re.sub(r"Data rate: ", r"", l)
+            data_rate = l.split(" ")[0]
+            rates.append(float(data_rate))
 
     print "Results"
     print "======="
     for i in xrange(len(sizes)):
-        fmt_str = "{0} Block size had a write rate of {1} MBps"
+        fmt_str = "{0} block size had a write rate of {1} MBps"
         print fmt_str.format(sizes[i], rates[i])
 
     raw_input("Press enter to draw graph")
