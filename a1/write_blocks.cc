@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
  
     /* Output processing rate */
     time_elapsed = end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
-    processing_rate = (double) arr_size / (time_elapsed * 1e6);
-    printf("Data rate: %.3f MBps\n", processing_rate);
+    processing_rate = (double) arr_size / time_elapsed;
+    printf("Data rate: %.3f BPS\n", processing_rate);
     fclose(fp_write);
 
     return 0;

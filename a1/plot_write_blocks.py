@@ -13,7 +13,8 @@ sizes = [
     32 * KB,
     1 * MB,
     2 * MB,
-    4 * MB
+    4 * MB,
+    8 * MB
 ]
 
 if __name__ == "__main__":
@@ -30,12 +31,12 @@ if __name__ == "__main__":
     print "Results"
     print "======="
     for i in xrange(len(sizes)):
-        fmt_str = "{0} block size had a write rate of {1} MBps"
+        fmt_str = "{0} block size had a write rate of {1} BPS"
         print fmt_str.format(sizes[i], rates[i])
 
     raw_input("Press enter to draw graph")
     plt.title("Data rate for write_blocks")
     plt.xlabel("Size in Bytes")
-    plt.ylabel("Data Rate in MBPs")
+    plt.ylabel("Data Rate in BPS")
     plt.plot(sizes, rates)
     plt.show()
