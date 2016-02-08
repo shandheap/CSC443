@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
 
     gettimeofday(&start, NULL);
     for (int i=0; i < num_of_blocks; i++) {
+        // Check if last block is incomplete and only write remaining records
         if (i == num_of_blocks - 1 && rec_rem) {
             rec_count = rec_rem;
         } else {
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     gettimeofday(&end, NULL);
  
     /* Output processing rate */
-    time_elapsed = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1e6;
+    time_elapsed = end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
     processing_rate = (double) arr_size / (time_elapsed * 1e6);
     printf("Data rate: %.3f MBps\n", processing_rate);
     fclose(fp_write);

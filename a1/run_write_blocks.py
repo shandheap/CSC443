@@ -40,8 +40,6 @@ if __name__ == "__main__":
         fmt_str = "{0} Block size had a write rate of {1} MBps"
         print fmt_str.format(sizes[i], rates[i])
 
-    print "Data rates for specified sizes are as follows:"
-    print rates
     raw_input("Press enter to draw graph")
     plt.title("Data rate for write_blocks")
     plt.xlabel("Size in Bytes")
