@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #define MAX_CHARS_PER_LINE 32
 
@@ -33,25 +33,25 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    clock_t begin, end;
+    struct timeval start, end;
     double time_spent = 0;
     long bytes_written = 0;
     /* Read lines and write them immediate into another text file */
     while (fgets(cur_line, MAX_CHARS_PER_LINE, fp_read) != NULL) {
         bytes_written += (double) strlen(cur_line) * sizeof(char);
 
-        begin = clock();
+        gettimeofday(&start, NULL);
         fwrite(&cur_line, sizeof(char), strlen(cur_line), fp_write);
         fflush(fp_write);
-        end = clock();
+        gettimeofday(&end, NULL);
         
-        time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+        time_spent += end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
     }
 
     fclose(fp_read);
     fclose(fp_write);
 
-    printf ("Data rate: %.3f MBPS\n", ((bytes_written*sizeof(char))/time_spent)/1000000);
+    printf ("Data rate: %.3f MBps\n", ((bytes_written*sizeof(char))/time_spent)/1000000);
 
     return 0;
 }
