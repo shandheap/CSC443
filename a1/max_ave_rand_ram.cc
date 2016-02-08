@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 #include <map>
@@ -56,7 +57,7 @@ int main(int argc, char *argv[]) {
     int rec_rem = (filesize % block_size) / sizeof(Record);
     int rec_count = records_per_block;
 
-    clock_t begin, end;
+    struct timeval start, end;
     double time_elapsed, processing_rate;
 
     /* Load the file into RAM */
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Read binary records from RAM */
-    begin = clock();
+    gettimeofday(&start, NULL);
     for (int i=0; i < num_of_blocks; i++) {
         // Check if last block is not full, if so then read partial block
         if (rand_blocks[i] == num_of_blocks-1 && rec_rem)
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    end = clock();
+    gettimeofday(&end, NULL);
 
     /* Clear file from RAM */
     munmap(mmap_ptr, filesize);
@@ -107,7 +108,7 @@ int main(int argc, char *argv[]) {
     printf("Average follower count is %f.\n", ave_count);
 
     /* Output processing rate */
-    time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    time_elapsed = end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
     processing_rate = (double) filesize / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
 }

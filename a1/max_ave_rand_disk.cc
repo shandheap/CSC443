@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 #include <map>
@@ -56,11 +57,11 @@ int main(int argc, char *argv[]) {
     int rec_rem = (filesize % block_size) / sizeof(Record);
     int rec_count = records_per_block;
 
-    clock_t begin, end;
+    struct timeval start, end;
     double time_elapsed, processing_rate;
 
     /* Read binary file from disk randomly */
-    begin = clock();
+    gettimeofday(&start, NULL);
     for (int i=0; i < num_of_blocks; i++) {
         // Set file pointer to random block
         fseek(fp_read, block_size * rand_blocks[i], SEEK_SET);
@@ -83,7 +84,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    end = clock();
+    gettimeofday(&end, NULL);
 
     /* Output max and average follower counts */ 
     double ave_count = (double) num_records / (double) users.size();
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
     printf("Average follower count is %f.\n", ave_count);
 
     /* Output processing rate */
-    time_elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    time_elapsed = end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
     processing_rate = (double) filesize / (time_elapsed * 1000000);
     printf("Data rate: %.3f MBPS\n", processing_rate);
 
