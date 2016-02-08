@@ -63,9 +63,9 @@ int main(int argc, char *argv[]) {
     block_size -= block_size % sizeof(Record);
     block_size = (block_size > arr_size) ? arr_size : block_size;
     long records_per_block = (long) block_size / sizeof(Record);
-    long num_of_blocks = (long) arr_size / block_size;
+    long num_of_blocks = ceil(arr_size / (double) block_size);
     // calculate the records remaining in the incomplete block
-    long rec_rem = records.size() - records_per_block * num_of_blocks;
+    int rec_rem = (arr_size % block_size) / sizeof(Record);
     
     FILE *fp_write;
     if ( !(fp_write = fopen(output_filename, "wb")) ) {
@@ -76,16 +76,18 @@ int main(int argc, char *argv[]) {
     /* Write pages to disk as blocks */
     struct timeval start, end;
     double time_elapsed, processing_rate;
-    
+    int rec_count;
+
     gettimeofday(&start, NULL);
     for (int i=0; i < num_of_blocks; i++) {
+        if (i == num_of_blocks - 1 && rec_rem) {
+            rec_count = rec_rem;
+        } else {
+            rec_count = records_per_block;
+        }
+
         int shift = i * records_per_block;
-        fwrite(&records[shift], sizeof(Record), records_per_block, fp_write);
-        fflush(fp_write);
-    }
-    
-    if (rec_rem > 0) {
-        fwrite(&records[num_of_blocks * records_per_block], sizeof(Record), rec_rem, fp_write);
+        fwrite(&records[shift], sizeof(Record), rec_count, fp_write);
         fflush(fp_write);
     }
     gettimeofday(&end, NULL);
