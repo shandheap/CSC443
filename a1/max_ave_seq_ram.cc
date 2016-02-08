@@ -100,6 +100,6 @@ int main(int argc, char *argv[]) {
 
     /* Output processing rate */
     time_elapsed = end.tv_sec - start.tv_sec + ((end.tv_usec - start.tv_usec) / 1e6);
-    processing_rate = (double) filesize / (time_elapsed * 1000000);
-    printf("Data rate: %.3f MBPS\n", processing_rate);
+    processing_rate = (double) filesize / time_elapsed;
+    printf("Data rate: %.3f BPS\n", processing_rate);
 }
