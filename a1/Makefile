@@ -1,6 +1,7 @@
 CC = g++
+all_progs = write_blocks write_lines max_ave_seq_disk max_ave_seq_ram max_ave_rand_disk max_ave_rand_ram
 
-all: write_blocks write_lines max_ave_seq_disk max_ave_seq_ram max_ave_rand_disk max_ave_rand_ram 
+all: $(all_progs) 
 library.o: library.cc library.h
 	$(CC) -o library.o -c library.cc
 
@@ -21,3 +22,6 @@ max_ave_rand_disk: max_ave_rand_disk.cc library.o
 
 max_ave_rand_ram: max_ave_rand_ram.cc library.o
 	$(CC) -o $@ $< library.o -g
+
+clean:
+	rm $(all_progs)
