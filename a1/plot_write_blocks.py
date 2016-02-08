@@ -13,8 +13,7 @@ sizes = [
     32 * KB,
     1 * MB,
     2 * MB,
-    4 * MB,
-    8 * MB
+    4 * MB
 ]
 
 if __name__ == "__main__":
