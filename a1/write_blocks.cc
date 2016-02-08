@@ -98,29 +98,5 @@ int main(int argc, char *argv[]) {
     printf("Data rate: %.3f MBps\n", processing_rate);
     fclose(fp_write);
 
-    /*//Test if array was written to disk properly
-    Record * buffer = (Record *) calloc(records_per_block, sizeof(Record));
-    if ( !(fp_read = fopen(output_filename, "rb")) ) {
-        printf("Could not open file %s for reading.\n", output_filename);
-        return -1;
-    } */
-
-    /* Read pages from disk as blocks
-    for (int i=0; i < num_of_blocks; i++) {
-        int shift = i * records_per_block;
-        fread(buffer, sizeof(Record), records_per_block, fp_read);
-
-        for (int j=0; j < records_per_block; j++) {
-            if (buffer[j].uid1 != records[shift+j].uid1 ||
-                buffer[j].uid2 != records[shift+j].uid2) {
-                printf("Error: Binary dat records do not match original.\n");
-                return -1;
-            }
-        }
-    }
-
-    fclose(fp_read);
-    free(buffer);*/
-
     return 0;
 }
