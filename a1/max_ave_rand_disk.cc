@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    long block_size = atol(argv[1]);
+    long block_size = atol(argv[2]);
     block_size -= block_size % sizeof(Record);
     
     /* Calculate the filesize */
