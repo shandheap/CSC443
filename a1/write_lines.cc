@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     fclose(fp_read);
     fclose(fp_write);
 
-    printf ("Data rate: %.3f MBps\n", ((bytes_written*sizeof(char))/time_spent)/1000000);
+    printf ("Data rate: %.3f BPS\n", (bytes_written*sizeof(char))/time_spent);
 
     return 0;
 }

@@ -15,17 +15,16 @@ typedef struct record {
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Error: Enter the block size as an argument.\n");
+    if (argc < 3) {
+        printf("Error: Enter the input filename and the block size as arguments\n");
         return -1;
     }
 
     FILE *fp_read;
-    char filename[] = "records.dat";
 
     /* Open file for reading */
-    if ( !(fp_read = fopen(filename, "rb")) ) {
-        printf("Could not open file %s for reading.\n", filename);
+    if ( !(fp_read = fopen(argv[1], "rb")) ) {
+        printf("Could not open file %s for reading.\n", argv[1]);
         return -1;
     }
 
