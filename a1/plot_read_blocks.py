@@ -19,7 +19,6 @@ if __name__ == "__main__":
             elif len(max_avg) == 1 and ("Average" in l):
                 max_avg.append(l.split()[-1])
 
-    print rates
     print "Results"
     print "======="
     print "Max follower count is " + max_avg[0]
