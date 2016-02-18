@@ -1,4 +1,5 @@
-#include <library.h>
+#include <stdio.h>
+#include "library.h"
 
 
 /**
@@ -14,4 +15,18 @@ int compare(const void *a, const void *b) {
     int b_uid2 = ((const Record *) b)->uid2;
 
     return a_uid2 - b_uid2;
+}
+
+/*
+ * Get the filesize of the file with pointer fp.
+ * Returns an integer which indicates the filesize.
+ */
+int get_filesize(FILE * fp) {
+    int filesize;
+
+    fseek(fp, 0L, SEEK_END);
+    filesize = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+
+    return filesize;
 }
