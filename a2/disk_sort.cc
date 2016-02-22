@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "library.h"
-
+#include "merge.h"
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
