@@ -48,3 +48,6 @@ records.txt
 # Big files
 edges.csv
 edges.dat
+
+# Temporary files
+temp.dat

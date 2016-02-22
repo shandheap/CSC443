@@ -15,10 +15,10 @@ int makeRun (SortingManager manager); //sorts each partition in turn, writes it 
  * Phase 2. Multiway merge 
  * **/
 typedef struct InputBuffer { //Input buffer - responsible for a single run
-    int capacity; //how many elements max can it howld
+    int capacity; //how many elements max can it hold
     long runLength; //total length of the corresponding run
     long currPositionInFile; //where to read next
-    long currentBufferPosition; //wheree to read the nextelement of the buffer
+    long currentBufferPosition; //where to read the next element of the buffer
     long totalElements; //how many total elements in buffer - may be different from max capacity
     int done; //set to 1 when the run is finished
     Record *buffer;  //array of Recordords

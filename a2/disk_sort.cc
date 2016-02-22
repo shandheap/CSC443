@@ -10,37 +10,56 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    FILE * fp_read;
-    if (! (fp_read = fopen(argv[1], "r")) ) {
+    FILE * inputFile;
+    if (! (inputFile = fopen(argv[1], "r")) ) {
         printf("Failed to open file %s\n", argv[1]);
         return -1;
     }
 
-    int total_mem = atoi(argv[2]);
-    int block_size = atoi(argv[3]);
-    int num_of_runs = atoi(argv[4]);
+    long totalMem = atol(argv[2]);
+    long blockSize = atol(argv[3]);
+    long totalPartitions = atol(argv[4]);
+    long filesize = get_filesize(inputFile);
+    long totalRecords = filesize / sizeof(Record);
+    long partitionRecords = totalRecords / totalPartitions;
+    long remRecords = totalRecords % totalPartitions;
+    Record * partitionBuffer = (Record *) calloc(totalRecords, sizeof(Record));
 
-    int filesize = get_filesize(fp_read);
-
-    int chunk_size = filesize / num_of_runs;
-    int total_running_mem = 0;
-    int records_per_chunk = chunk_size / sizeof(Record);
-
-    FILE * fp_write;
-    if (! (fp_write = fopen("sorted_phase1.dat", "w")) ) {
-        printf("Failed to open file %s\n", argv[1]);
+    // Gracefully exit if partition is bigger than available memory
+    if ((partitionRecords * sizeof(Record)) > totalMem) {
+        printf("Partition size exceeded available memory, exiting program...\n");
         return -1;
     }
 
-    Record * buffer = (Record *) calloc(records_per_chunk, sizeof(Record));
-    for (int i=0; i < num_of_runs; i++) {
-        fread(buffer, sizeof(Record), records_per_chunk, fp_read);
-        qsort(buffer, records_per_chunk, sizeof(Record), compare);
-        fwrite(buffer, sizeof(Record), records_per_chunk, fp_write);
+
+    // initialize sorting manager
+    SortingManager manager = {
+        partitionBuffer,
+        inputFile,
+        partitionRecords,
+        totalPartitions
+    };
+
+    // sort one partition at a time
+    long i;
+    for (i=0; i<totalPartitions; i++) {
+        if (makeRun(manager)) {
+            printf("Failed to make run\n");
+            return -1;
+        }
     }
 
-    fclose(fp_read);
-    fclose(fp_write);
+    // sort remaining records
+    if (remRecords) {
+        manager.totalRecords = remRecords;
+        if (makeRun(manager)) {
+            printf("Failed to make run\n");
+            return -1;
+        }
+    }
+
+    fclose(inputFile);
+    free(partitionBuffer);
 
     return 0;
 }

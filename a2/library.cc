@@ -21,8 +21,8 @@ int compare(const void *a, const void *b) {
  * Get the filesize of the file with pointer fp.
  * Returns an integer which indicates the filesize.
  */
-int get_filesize(FILE * fp) {
-    int filesize;
+long get_filesize(FILE * fp) {
+    long filesize;
 
     fseek(fp, 0L, SEEK_END);
     filesize = ftell(fp);
