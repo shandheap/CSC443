@@ -4,6 +4,7 @@ typedef struct record {
 } Record;
 
 #define TEMP_FILE "temp.dat"
+#define SORT_FILE "edges_sorted.dat"
 
 int compare(const void *a, const void *b);
 long get_filesize(FILE * fp);

@@ -31,9 +31,10 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    /* Phase 1 */
 
     // initialize sorting manager
-    SortingManager manager = {
+    SortingManager sortingManager = {
         partitionBuffer,
         inputFile,
         partitionRecords,
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     // sort one partition at a time
     long i;
     for (i=0; i<totalPartitions; i++) {
-        if (makeRun(manager)) {
+        if (makeRun(sortingManager)) {
             printf("Failed to make run\n");
             return -1;
         }
@@ -51,8 +52,8 @@ int main(int argc, char *argv[]) {
 
     // sort remaining records
     if (remRecords) {
-        manager.totalRecords = remRecords;
-        if (makeRun(manager)) {
+        sortingManager.totalRecords = remRecords;
+        if (makeRun(sortingManager)) {
             printf("Failed to make run\n");
             return -1;
         }
@@ -60,6 +61,34 @@ int main(int argc, char *argv[]) {
 
     fclose(inputFile);
     free(partitionBuffer);
+
+    /* Phase 2 */
+    FILE * outputFile;
+    if (! (outputFile = fopen(TEMP_FILE, "r")) ) {
+        printf("Failed to open sorted file to write to\n");
+        return -1;
+    }
+
+    blockSize -= blockSize % sizeof(Record);
+    int blockRecords = blockSize / sizeof(Record);
+
+    Record * heap = (Record *) calloc(totalPartitions, sizeof(Record));
+    Record * outputBuffer = (Record *) calloc(blockRecords, sizeof(Record));
+    MergeManager mergeManager = {
+        heap,
+        0,
+        totalPartitions,
+        0,
+        outputFile,
+        outputBuffer,
+        0,
+        blockRecords,
+        0
+    };
+
+    free(heap);
+    fclose(inputFile);
+    fclose(outputFile);
 
     return 0;
 }
