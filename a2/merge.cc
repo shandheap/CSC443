@@ -5,31 +5,31 @@
 
 
 int makeRun (SortingManager manager, int run_id) {
-    Record * partitionBuffer = manager.partitionBuffer;
-    FILE * inputFile = manager.inputFile;
-    long totalRecords = manager.totalRecords;
+   Record * partitionBuffer = manager.partitionBuffer;
+   FILE * inputFile = manager.inputFile;
+   long totalRecords = manager.totalRecords;
 
-    FILE * outputFile;
-    char filename[17];
-    snprintf(filename, sizeof(filename), "temp%d.dat", run_id);
+   FILE * outputFile;
+   char filename[17];
+   snprintf(filename, sizeof(filename), "temp%d.dat", run_id);
 
-    if (! (outputFile = fopen(filename, "a")) ) {
-        printf("Failed to open file %s\n", filename);
-        return -1;
-    }
+   if (! (outputFile = fopen(filename, "a")) ) {
+      printf("Failed to open file %s\n", filename);
+      return -1;
+   }
 
-    int size;
-    size = fread(partitionBuffer, sizeof(Record), totalRecords, inputFile);
-    if (size != totalRecords) return -1;
+   int size;
+   size = fread(partitionBuffer, sizeof(Record), totalRecords, inputFile);
+   if (size != totalRecords) return -1;
     
-    qsort(partitionBuffer, totalRecords, sizeof(Record), compare);
+   qsort(partitionBuffer, totalRecords, sizeof(Record), compare);
     
-    size = fwrite(partitionBuffer, sizeof(Record), totalRecords, outputFile);
-    if (size != totalRecords) return -1;
+   size = fwrite(partitionBuffer, sizeof(Record), totalRecords, outputFile);
+   if (size != totalRecords) return -1;
 
-    fclose(outputFile);
+   fclose(outputFile);
 
-    return 0;
+   return 0;
 }
 /*
 int mergeRuns (MergeManager *merger) {
@@ -77,32 +77,33 @@ int mergeRuns (MergeManager *merger) {
     return 0;   
 }
 */
+
 int initInputBuffers(MergeManager *merger) {
-    int heapSize = merger->heapSize;
-    InputBuffer * inputBuffers = (InputBuffer *) calloc(heapSize, sizeof(InputBuffer));
-    for (int i=0; i<heapSize; i++) {
-        int max_size = merger->outputBufferCapacity;
-        Record * buffer = (Record *) calloc(max_size, sizeof(Record));
-        InputBuffer bufferInit = {
-            max_size,
-            0L, /* This will be reinitialised in refillBuffer */
-            0L,
-            0L,
-            0,
-            0,
-            buffer
-        };
-        inputBuffers[i] = bufferInit;
-    }
+   int heapCapacity = merger->heapCapacity;
+   InputBuffer * inputBuffers = (InputBuffer *) calloc(heapCapacity, sizeof(InputBuffer));
+   for (int i=0; i<heapCapacity; i++) {
+      int max_size = merger->outputBufferCapacity;
+      Record * buffer = (Record *) calloc(max_size, sizeof(Record));
+      InputBuffer bufferInit = {
+         max_size,
+         0L, /* This will be reinitialised in refillBuffer */
+         0L,
+         0L,
+         0,
+         0,
+         buffer
+      };
+      inputBuffers[i] = bufferInit;
+   }
 
-    merger->inputBuffers = inputBuffers;
-    
-    // now fills the input buffers with actual values from disk temp.dat files
-    for (int i=0; i<heapSize; i++) {
-        refillBuffer(merger, i);
-    }
+   merger->inputBuffers = inputBuffers;
+ 
+   // now fills the input buffers with actual values from disk temp.dat files
+   for (int i=0; i<heapCapacity; i++) {
+      refillBuffer(merger, i);
+   }
 
-    return 0;
+   return 0;
 };
 
 int initHeap(MergeManager *merger) {
@@ -110,7 +111,7 @@ int initHeap(MergeManager *merger) {
 
    // Initialize the heap
    HeapRecord * heap = (HeapRecord *) calloc(heapCapacity, sizeof(HeapRecord));
-   
+
    // Go through all runs and fill heap
    for (int i = 0; i < heapCapacity; i++) {
       Record cur;
@@ -126,42 +127,42 @@ int getNextRecord(MergeManager *merger, int run_id, Record *result) {
 };
 
 int refillBuffer(MergeManager *merger, int run_id) {
+   InputBuffer *bufferToRefill = &merger->inputBuffers[run_id];
+ 
+   // Name of the temp file corresponding to the run_id
+   char filename[17];
+   FILE *inputFile;
+   sprintf(filename, "temp%d.dat", run_id);
+   if (! (inputFile = fopen(filename, "r")) ) {
+      printf("Failed to open file %s\n", filename);
+      return -1;
+   }    
+   // Reset the currentBufferPosition to 0
+   bufferToRefill->currentBufferPosition = 0L;
     
-    InputBuffer *bufferToRefill = &merger->inputBuffers[run_id];
-    
-    // Name of the temp file corresponding to the run_id
-    char filename[17];
-    FILE *inputFile;
-    sprintf(filename, "temp%d.dat", run_id);
-    if (! (inputFile = fopen(filename, "r")) ) {
-        printf("Failed to open file %s\n", filename);
-        return -1;
-    }    
-    // Reset the currentBufferPosition to 0
-    bufferToRefill->currentBufferPosition = 0L;
-    
-    // initialise the runLength of the input buffer if it is not done yet
-    if (bufferToRefill->runLength == 0) {
-        bufferToRefill->runLength = get_filesize(inputFile) / sizeof(Record);
-    }
-    // Check if the run is depleted already
-    if (bufferToRefill->currPositionInFile >= bufferToRefill->runLength * (long) sizeof(Record)) {
-        return -1;
-    }
-    // Read records drom disk and fill the inputBuffer with them
-    int rec_rem_to_read =  bufferToRefill->runLength - (int) (bufferToRefill->currPositionInFile / sizeof(Record));
-    int rec_to_read = (bufferToRefill->capacity > rec_rem_to_read) ? rec_rem_to_read : bufferToRefill->capacity;
-    Record *buffer = (Record *) calloc(rec_to_read, sizeof(Record));
-    fseek(inputFile, bufferToRefill->currPositionInFile, SEEK_SET); // Set the filepointer to bufferToRefill->currPositionInFile
-    fread(buffer, sizeof(Record), rec_to_read, inputFile);
-    bufferToRefill->buffer = buffer;
-    
-    // Shift the bufferToRefill->currPositionInFile
-    bufferToRefill->currPositionInFile += rec_to_read * sizeof(Record);
-    
-    fclose(inputFile);
-    
-    return 0;
+   // initialise the runLength of the input buffer if it is not done yet
+   if (bufferToRefill->runLength == 0) {
+      bufferToRefill->runLength = get_filesize(inputFile) / sizeof(Record);
+   }
+   // Check if the run is depleted already
+   if (bufferToRefill->currPositionInFile >= bufferToRefill->runLength * (long) sizeof(Record)) {
+      return -1;
+   }
+   
+   // Read records drom disk and fill the inputBuffer with them
+   int rec_rem_to_read =  bufferToRefill->runLength - (int) (bufferToRefill->currPositionInFile / sizeof(Record));
+   int rec_to_read = (bufferToRefill->capacity > rec_rem_to_read) ? rec_rem_to_read : bufferToRefill->capacity;
+   Record *buffer = (Record *) calloc(rec_to_read, sizeof(Record));
+   fseek(inputFile, bufferToRefill->currPositionInFile, SEEK_SET); // Set the filepointer to bufferToRefill->currPositionInFile
+   fread(buffer, sizeof(Record), rec_to_read, inputFile);
+   bufferToRefill->buffer = buffer;
+ 
+   // Shift the bufferToRefill->currPositionInFile
+   bufferToRefill->currPositionInFile += rec_to_read * sizeof(Record);
+
+   fclose(inputFile);
+
+   return 0;
 }
 
 int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
