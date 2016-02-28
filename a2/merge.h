@@ -1,3 +1,9 @@
+typedef struct heapRecord {
+	int uid1;
+	int uid2;
+	int run_id;
+} HeapRecord;
+
 /**
 Phase 1. Sorting of records in each partition
 **/
@@ -25,7 +31,7 @@ typedef struct InputBuffer { //Input buffer - responsible for a single run
 } InputBuffer;
 
 typedef struct MergeManager { //Bookkeeping: keeps track of all necessary variables during external merge
-	Record *heap;  //keeps 1 from each buffer in top-down order - smallest on top (according to compare function)
+	HeapRecord *heap;  //keeps 1 from each buffer in top-down order - smallest on top (according to compare function)
 	int heapSize; //current number of elements in the heap
 	int heapCapacity; //max number of elements
 	FILE *inputFP; //stays closed, opens each time we need to refill some amount of data from a disk run	
@@ -43,7 +49,7 @@ int getNextRecord (MergeManager *merger, int run_id, Record *result); //reads th
 // uploads next part of a run from disk if necessary by calling refillBuffer
 int refillBuffer(MergeManager *merger, int run_id);
 
-int insertIntoHeap (MergeManager *merger, Record *newRecord); //inserts next element into heap
-int getTopHeapElement (MergeManager *merger, int run_id, Record *result); //removes smallest element from the heap, and restores heap order
+int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord); //inserts next element into heap
+int getTopHeapElement (MergeManager *merger, HeapRecord *result); //removes smallest element from the heap, and restores heap order
 int addToOutputBuffer(MergeManager *merger, Record * newRecord); //adds next smallest element to the output buffer, flushes buffer if full by calling flushOutputBuffer
 int flushOutputBuffer(MergeManager *merger);

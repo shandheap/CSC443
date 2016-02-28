@@ -102,7 +102,21 @@ int initInputBuffers(MergeManager *merger) {
     return 0;
 };
 
-int initHeap(MergeManager *merger);
+int initHeap(MergeManager *merger) {
+   int heapCapacity = merger->heapCapacity;
+
+   // Initialize the heap
+   HeapRecord * heap = (HeapRecord *) calloc(heapCapacity, sizeof(HeapRecord));
+   
+   // Go through all runs and fill heap
+   for (int i = 0; i < heapCapacity; i++) {
+      Record cur;
+      getNextRecord(merger, i, &cur);
+      insertIntoHeap(merger, i, &cur);
+   }
+
+   return 0;
+}
 
 int getNextRecord (MergeManager *merger, int run_id, Record *result);
 
@@ -145,11 +159,74 @@ int refillBuffer(MergeManager *merger, int run_id) {
     return 0;
 }
 
-int insertIntoHeap (MergeManager *merger, Record *newRecord);
+int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
+   HeapRecord * hrecord;
+   hrecord->uid1 = newRecord->uid1;
+   hrecord->uid2 = newRecord->uid2;
+   hrecord->run_id = run_id;
+   
+   int child, parent;
+   if (merger->heapSize == merger->heapCapacity) {
+      printf( "Error: Heap is full\n");
+      return -1;
+   }
+   
+   child = merger->heapSize++; /* the next available slot in the heap */
+   
+   while (child > 0)    {
+      parent = (child - 1) / 2;
+      if (compare((void *) &(merger->heap[parent]), (void *) hrecord)>0) {
+         merger->heap[child] = merger->heap[parent];
+         child = parent;
+      } else {
+         break;
+      }
+   }
+   
+   merger->heap[child]= *hrecord;   
+   
+   return 0;
+};
 
-int getTopHeapElement (MergeManager *merger, int run_id, Record *result);
+int getTopHeapElement (MergeManager *merger, int run_id, Record *result) {
+   HeapRecord item;
+   int child, parent;
+
+   if (merger->heapSize == 0) {
+      printf( "Error: Popping top element from an empty heap\n");
+      return 1;
+   }
+
+   HeapRecord topElem = merger->heap[0];
+   result->uid1 = topElem.uid1;
+   result->uid2 = topElem.uid2;
+
+   // now we need to reorganize heap - keep the smallest on top
+   item = merger->heap [-- merger->heapSize]; // to be reinserted 
+
+   parent = 0;
+
+   do {
+      child = (2 * parent) + 1;
+
+      // if there are two children, compare them 
+      if (child + 1 < merger->heapSize && (compare((void *)&(merger->heap[child]),(void *)&(merger->heap[child + 1]))>0)) {
+         ++child;
+      }
+      // compare item with the larger 
+      if (compare((void *)&item, (void *)&(merger->heap[child]))>0) {
+         merger->heap[parent] = merger->heap[child];
+         parent = child;
+      } else {
+         break;
+      }
+   } while (child < merger->heapSize);
+
+   merger->heap[parent] = item;
+   
+   return 0;
+};
 
 int addToOutputBuffer(MergeManager *merger, Record * newRecord);
 
 int flushOutputBuffer(MergeManager *merger);
-
