@@ -31,52 +31,57 @@ int makeRun (SortingManager manager, int run_id) {
 
    return 0;
 }
-/*
+
 int mergeRuns (MergeManager *merger) {
-    int  result;
-    //1. go in the loop through all input files and fill-in initial buffers
-    if (initInputBuffers(merger)!=0)
-        return 1;
+   int result;
     
-    //2. Initialize heap with 1 element from each buffer
-    if (initHeap(merger)!=0)
-        return 1;   
+   //1. go in the loop through all input files and fill-in initial buffers
+   if (initInputBuffers(merger))
+      return 1;
     
-    while (merger->heapSize > 0) { //heap is not empty  
-        Record smallest;
-        Record next;
-        
-        int runID;
-        
-        if (getTopHeapElement (merger, &runID, &smallest)!=0)
-            return 1;   
+   //2. Initialize heap with 1 element from each buffer
+   if (initHeap(merger))
+      return 1;   
+    
+   while (merger->heapSize > 0) { //heap is not empty  
+      HeapRecord smallest;
+  
+      if (getTopHeapElement (merger, &smallest))
+         return 1; 
 
-        merger->outputBuffer[merger->currentPositionInOutputBuffer++]=smallest;     
+      Record r;
+      r.uid1 = smallest.uid1;
+      r.uid2 = smallest.uid2;
+      int run_id = smallest.run_id;
 
-        result = getNextRecord (merger, runID, &next);
+      merger->outputBuffer[merger->currentPositionInOutputBuffer++] = r;     
 
-        if(next != NULL) {//next element exists     
-            if(insertIntoHeap (merger, &next)!=0)
-                return 1;
-        }
-        if(result==1) //error
+      Record * next;
+      result = getNextRecord (merger, run_id, next);
+
+      if (next != NULL) {//next element exists     
+         if (insertIntoHeap (merger, run_id, next))
             return 1;
-        
-        if(merger->currentPositionInOutputBuffer == merger-> outputBufferCapacity ) { //staying on the last slot of the output buffer - next will cause overflow
-            if(flushOutputBuffer(merger)!=0)
-                return 1;           
-            merger->currentPositionInOutputBuffer=0;
-        }   
-    }
-    //flush what remains in output buffer
-    if(merger->currentPositionInOutputBuffer >0) { //there are elements in the output buffer    
-        if(flushOutputBuffer(merger)!=0)
-            return 1;
-    }
+      }
+      
+      if (result) //error
+         return 1;
 
-    return 0;   
+      // staying on the last slot of the output buffer - next will cause overflow
+      if (merger->currentPositionInOutputBuffer == merger->outputBufferCapacity) { 
+         if (flushOutputBuffer(merger))
+            return 1;           
+      } 
+   }
+
+   // flush what remains in output buffer
+   if (merger->currentPositionInOutputBuffer) { // there are elements in the output buffer    
+      if (flushOutputBuffer(merger))
+         return 1;
+   }
+
+   return 0;   
 }
-*/
 
 int initInputBuffers(MergeManager *merger) {
    int heapCapacity = merger->heapCapacity;
@@ -194,7 +199,7 @@ int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
    return 0;
 };
 
-int getTopHeapElement (MergeManager *merger, int run_id, Record *result) {
+int getTopHeapElement (MergeManager *merger, Record *result) {
    HeapRecord item;
    int child, parent;
 
@@ -245,8 +250,7 @@ int addToOutputBuffer(MergeManager *merger, Record * newRecord) {
    }
 
    // Add new record to output buffer
-   merger->outputBuffer[currentPositionInOutputBuffer] = *newRecord;
-   currentPositionInOutputBuffer++;
+   merger->outputBuffer[currentPositionInOutputBuffer++] = *newRecord;
 
    return 0;
 }
