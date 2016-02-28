@@ -200,7 +200,7 @@ int getTopHeapElement (MergeManager *merger, int run_id, Record *result) {
 
    if (merger->heapSize == 0) {
       printf( "Error: Popping top element from an empty heap\n");
-      return 1;
+      return -1;
    }
 
    HeapRecord topElem = merger->heap[0];
@@ -233,6 +233,34 @@ int getTopHeapElement (MergeManager *merger, int run_id, Record *result) {
    return 0;
 };
 
-int addToOutputBuffer(MergeManager *merger, Record * newRecord);
+int addToOutputBuffer(MergeManager *merger, Record * newRecord) {
+   int currentPositionInOutputBuffer = merger->currentPositionInOutputBuffer;
+   int outputBufferCapacity = merger->outputBufferCapacity;
 
-int flushOutputBuffer(MergeManager *merger);
+   // Check if buffer is full and flush its contents
+   bool is_full = currentPositionInOutputBuffer == outputBufferCapacity;
+   if (is_full && flushOutputBuffer(merger)) {
+      printf("Error: Failed to flush the output buffer\n");
+      return -1;
+   }
+
+   // Add new record to output buffer
+   merger->outputBuffer[currentPositionInOutputBuffer] = *newRecord;
+   currentPositionInOutputBuffer++;
+
+   return 0;
+}
+
+int flushOutputBuffer(MergeManager *merger) {
+   Record * outputBuffer = merger->outputBuffer;
+   int outputBufferCapacity = merger->outputBufferCapacity;
+   FILE * outputFP = merger->outputFP;
+
+   int size;
+   size = fwrite(outputBuffer, sizeof(Record), outputBufferCapacity, outputFP);
+   if (size != outputBufferCapacity) return -1;
+
+   merger->currentPositionInOutputBuffer = 0;
+
+   return 0;
+}
