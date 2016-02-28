@@ -23,7 +23,8 @@ int main(int argc, char *argv[]) {
     long totalRecords = filesize / sizeof(Record);
     long partitionRecords = totalRecords / totalPartitions;
     long remRecords = totalRecords % totalPartitions;
-    Record * partitionBuffer = (Record *) calloc(totalRecords, sizeof(Record));
+    partitionRecords += remRecords;
+    Record * partitionBuffer = (Record *) calloc(partitionRecords, sizeof(Record));
 
     // Gracefully exit if partition is bigger than available memory
     if ((partitionRecords * sizeof(Record)) > totalMem) {
@@ -48,17 +49,8 @@ int main(int argc, char *argv[]) {
             printf("Failed to make run\n");
             return -1;
         }
-    }
-
-    // sort remaining records
-    if (remRecords) {
-        sortingManager.totalRecords = remRecords;
-        if (makeRun(sortingManager, i)) {
-            printf("Failed to make run\n");
-            return -1;
-        }
-        // incomplete partition so increase totalPartitions
-        totalPartitions++;
+        // change number of records to read after first bigger chunk
+        if (i == 0) sortingManager.totalRecords -= remRecords;
     }
 
     fclose(inputFile);
