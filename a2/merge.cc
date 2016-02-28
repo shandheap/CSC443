@@ -56,7 +56,7 @@ int mergeRuns (MergeManager *merger) {
 
         merger->outputBuffer[merger->currentPositionInOutputBuffer++] = r;     
 
-        Record * next;
+        Record * next = (Record *) malloc(sizeof(Record));
         result = getNextRecord (merger, run_id, next);
 
         if (next != NULL) {//next element exists     
