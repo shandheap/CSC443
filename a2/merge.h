@@ -15,7 +15,7 @@ typedef struct SortingManager {
 } SortingManager;
 
 
-int makeRun (SortingManager manager); //sorts each partition in turn, writes it to a temp disk file, returns zero on success
+int makeRun (SortingManager manager, int run_id); //sorts each partition in turn, writes it to a temp disk file, returns zero on success
 
 /**
 Phase 2. Multiway merge 

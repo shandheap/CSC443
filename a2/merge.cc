@@ -4,14 +4,17 @@
 #include "merge.h"
 
 
-int makeRun (SortingManager manager) {
+int makeRun (SortingManager manager, int run_id) {
     Record * partitionBuffer = manager.partitionBuffer;
     FILE * inputFile = manager.inputFile;
     long totalRecords = manager.totalRecords;
 
     FILE * outputFile;
-    if (! (outputFile = fopen(TEMP_FILE, "a")) ) {
-        printf("Failed to open file %s\n", TEMP_FILE);
+    char filename[17];
+    snprintf(filename, sizeof(filename), "temp%d.dat", run_id);
+
+    if (! (outputFile = fopen(filename, "a")) ) {
+        printf("Failed to open file %s\n", filename);
         return -1;
     }
 
@@ -118,7 +121,9 @@ int initHeap(MergeManager *merger) {
    return 0;
 }
 
-int getNextRecord (MergeManager *merger, int run_id, Record *result);
+int getNextRecord(MergeManager *merger, int run_id, Record *result) {
+   return 0;
+};
 
 int refillBuffer(MergeManager *merger, int run_id) {
     

@@ -50,4 +50,4 @@ edges.csv
 edges.dat
 
 # Temporary files
-temp.dat
+temp*.dat

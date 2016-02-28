@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     // sort one partition at a time
     long i;
     for (i=0; i<totalPartitions; i++) {
-        if (makeRun(sortingManager)) {
+        if (makeRun(sortingManager, i)) {
             printf("Failed to make run\n");
             return -1;
         }
@@ -53,16 +53,18 @@ int main(int argc, char *argv[]) {
     // sort remaining records
     if (remRecords) {
         sortingManager.totalRecords = remRecords;
-        if (makeRun(sortingManager)) {
+        if (makeRun(sortingManager, i)) {
             printf("Failed to make run\n");
             return -1;
         }
+        // incomplete partition so increase totalPartitions
+        totalPartitions++;
     }
 
     fclose(inputFile);
     free(partitionBuffer);
 
-    /* Phase 2 */
+    /* Phase 2 
     FILE * outputFile;
     if (! (outputFile = fopen(TEMP_FILE, "r")) ) {
         printf("Failed to open sorted file to write to\n");
@@ -89,6 +91,7 @@ int main(int argc, char *argv[]) {
     free(heap);
     fclose(inputFile);
     fclose(outputFile);
+    */
 
     return 0;
 }
