@@ -127,9 +127,9 @@ int initHeap(MergeManager *merger) {
     return 0;
 }
 
-int getNextRecord(MergeManager *merger, int run_id, Record *result) {
-   
-    InputBuffer * inputBuffer = &merger->inputBuffers[run_id];
+int getNextRecord(MergeManager *merger, int run_id, Record *result) {   
+    InputBuffer * inputBuffer = &(merger->inputBuffers[run_id]);
+
     // Check if there is any more records left get from the buffer
     if (inputBuffer->currentBufferPosition >= inputBuffer->totalElements) {
         int status = refillBuffer(merger, run_id);
@@ -137,8 +137,8 @@ int getNextRecord(MergeManager *merger, int run_id, Record *result) {
             return status;
         }
     }
-    result = inputBuffer->buffer[inputBuffer->currentBufferPosition];
-    inputBuffer->currentBufferPosition++;
+
+    *result = inputBuffer->buffer[inputBuffer->currentBufferPosition ++];
    
     return 0;
 }
@@ -212,7 +212,7 @@ int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
     return 0;
 };
 
-int getTopHeapElement (MergeManager *merger, Record *result) {
+int getTopHeapElement (MergeManager *merger, HeapRecord *result) {
     HeapRecord item;
     int child, parent;
 
