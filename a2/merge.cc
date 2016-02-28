@@ -128,8 +128,20 @@ int initHeap(MergeManager *merger) {
 }
 
 int getNextRecord(MergeManager *merger, int run_id, Record *result) {
+   
+    InputBuffer * inputBuffer = &merger->inputBuffers[run_id];
+    // Check if there is any more records left get from the buffer
+    if (inputBuffer->currentBufferPosition >= inputBuffer->totalElements) {
+        int status = refillBuffer(merger, run_id);
+        if (status != 0) { // The run is depleted or there was some error
+            return status;
+        }
+    }
+    result = inputBuffer->buffer[inputBuffer->currentBufferPosition];
+    inputBuffer->currentBufferPosition++;
+   
     return 0;
-};
+}
 
 int refillBuffer(MergeManager *merger, int run_id) {
     InputBuffer *bufferToRefill = &merger->inputBuffers[run_id];
