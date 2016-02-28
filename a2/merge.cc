@@ -56,11 +56,11 @@ int mergeRuns (MergeManager *merger) {
 
         merger->outputBuffer[merger->currentPositionInOutputBuffer++] = r;     
 
-        Record * next = (Record *) malloc(sizeof(Record));
-        result = getNextRecord (merger, run_id, next);
+        Record next;
+        result = getNextRecord (merger, run_id, &next);
 
-        if (next != NULL) {//next element exists     
-            if (insertIntoHeap (merger, run_id, next))
+        if (result == 0) {//next element exists     
+            if (insertIntoHeap (merger, run_id, &next))
                 return 1;
         }
         
@@ -174,7 +174,8 @@ int refillBuffer(MergeManager *merger, int run_id) {
     fseek(inputFile, bufferToRefill->currPositionInFile, SEEK_SET); // Set the filepointer to bufferToRefill->currPositionInFile
     fread(buffer, sizeof(Record), rec_to_read, inputFile);
     bufferToRefill->buffer = buffer;
- 
+    // Set the total element in bufferToRefill
+    bufferToRefill->totalElements = (long) rec_to_read;
     // Shift the bufferToRefill->currPositionInFile
     bufferToRefill->currPositionInFile += rec_to_read * sizeof(Record);
 
@@ -184,10 +185,10 @@ int refillBuffer(MergeManager *merger, int run_id) {
 }
 
 int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
-    HeapRecord * hrecord;
-    hrecord->uid1 = newRecord->uid1;
-    hrecord->uid2 = newRecord->uid2;
-    hrecord->run_id = run_id;
+    HeapRecord hrecord;
+    hrecord.uid1 = newRecord->uid1;
+    hrecord.uid2 = newRecord->uid2;
+    hrecord.run_id = run_id;
 
     int child, parent;
     if (merger->heapSize == merger->heapCapacity) {
@@ -199,7 +200,7 @@ int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
 
     while (child > 0)    {
         parent = (child - 1) / 2;
-        if (compare((void *) &(merger->heap[parent]), (void *) hrecord)>0) {
+        if (compare((void *) &(merger->heap[parent]), (void *) &hrecord)>0) {
             merger->heap[child] = merger->heap[parent];
             child = parent;
         } else {
@@ -207,7 +208,7 @@ int insertIntoHeap (MergeManager *merger, int run_id, Record *newRecord) {
         }
     }
 
-    merger->heap[child]= *hrecord;   
+    merger->heap[child]= hrecord;   
 
     return 0;
 };
@@ -224,7 +225,7 @@ int getTopHeapElement (MergeManager *merger, HeapRecord *result) {
     HeapRecord topElem = merger->heap[0];
     result->uid1 = topElem.uid1;
     result->uid2 = topElem.uid2;
-
+    result->run_id = topElem.run_id;
     // now we need to reorganize heap - keep the smallest on top
     item = merger->heap [-- merger->heapSize]; // to be reinserted 
 
