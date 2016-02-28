@@ -115,7 +115,7 @@ int initHeap(MergeManager *merger) {
     int heapCapacity = merger->heapCapacity;
 
     // Initialize the heap
-    HeapRecord * heap = (HeapRecord *) calloc(heapCapacity, sizeof(HeapRecord));
+    //HeapRecord * heap = (HeapRecord *) calloc(heapCapacity, sizeof(HeapRecord));
 
     // Go through all runs and fill heap
     for (int i = 0; i < heapCapacity; i++) {
@@ -231,22 +231,19 @@ int getTopHeapElement (MergeManager *merger, HeapRecord *result) {
 
     parent = 0;
 
-    do {
-        child = (2 * parent) + 1;
-
-        // if there are two children, compare them 
-        if (child + 1 < merger->heapSize && (compare((void *)&(merger->heap[child]),(void *)&(merger->heap[child + 1]))>0)) {
-            ++child;
-        }
-        // compare item with the larger 
-        if (compare((void *)&item, (void *)&(merger->heap[child]))>0) {
-            merger->heap[parent] = merger->heap[child];
-            parent = child;
-        } else {
-            break;
-        }
-    } while (child < merger->heapSize);
-
+	while ((child = (2 * parent) + 1) < merger->heapSize) {
+		// if there are two children, compare them 
+		if (child + 1 < merger->heapSize && (compare((void *)&(merger->heap[child]),(void *)&(merger->heap[child + 1]))>0)) {
+			++child;
+		}
+		// compare item with the larger 
+		if (compare((void *)&item, (void *)&(merger->heap[child]))>0) {
+			merger->heap[parent] = merger->heap[child];
+			parent = child;
+		} else {
+			break;
+		}
+	}
     merger->heap[parent] = item;
 
     return 0;
