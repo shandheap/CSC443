@@ -64,7 +64,7 @@ int mergeRuns (MergeManager *merger) {
                 return 1;
         }
         
-        if (result) //error
+        if (result == 1) //error
             return 1;
 
         // staying on the last slot of the output buffer - next will cause overflow
@@ -152,7 +152,7 @@ int refillBuffer(MergeManager *merger, int run_id) {
     sprintf(filename, "temp%d.dat", run_id);
     if (! (inputFile = fopen(filename, "r")) ) {
         printf("Failed to open file %s\n", filename);
-        return -1;
+        return 1;
     }
 
     // Reset the currentBufferPosition to 0
