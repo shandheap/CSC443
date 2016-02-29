@@ -100,9 +100,7 @@ int initInputBuffers(MergeManager *merger) {
         };
         inputBuffers[i] = bufferInit;
     }
-
     merger->inputBuffers = inputBuffers;
- 
     // now fills the input buffers with actual values from disk temp.dat files
     for (int i=0; i<heapCapacity; i++) {
         refillBuffer(merger, i);
@@ -137,7 +135,6 @@ int getNextRecord(MergeManager *merger, int run_id, Record *result) {
             return status;
         }
     }
-
     *result = inputBuffer->buffer[inputBuffer->currentBufferPosition ++];
    
     return 0;
@@ -154,13 +151,13 @@ int refillBuffer(MergeManager *merger, int run_id) {
         printf("Failed to open file %s\n", filename);
         return 1;
     }
-
-    // Reset the currentBufferPosition to 0
-    bufferToRefill->currentBufferPosition = 0L;
-     
     // initialise the runLength of the input buffer if it is not done yet
     if (bufferToRefill->runLength == 0) {
         bufferToRefill->runLength = get_filesize(inputFile) / sizeof(Record);
+    }
+    // initialise the capacity of the input buffer if it is not done yet
+    if (bufferToRefill->capacity == 0) {
+        bufferToRefill->capacity = merger->outputBufferCapacity;
     }
     // Check if the run is depleted already
     if (bufferToRefill->currPositionInFile >= bufferToRefill->runLength * (long) sizeof(Record)) {
@@ -176,6 +173,8 @@ int refillBuffer(MergeManager *merger, int run_id) {
     bufferToRefill->buffer = buffer;
     // Set the total element in bufferToRefill
     bufferToRefill->totalElements = (long) rec_to_read;
+    // Reset the currentBufferPosition to 0
+    bufferToRefill->currentBufferPosition = 0L;
     // Shift the bufferToRefill->currPositionInFile
     bufferToRefill->currPositionInFile += rec_to_read * sizeof(Record);
 
