@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
             prev = buffer->uid2;
         } else {
             if (buffer->uid2 < max) {
-                printf("Error: Records not sorted properly\n");
+                printf("Error: Records not sorted properly at index %d\n", i);
                 return -1;
             }
 

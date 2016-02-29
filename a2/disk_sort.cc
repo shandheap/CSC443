@@ -59,34 +59,30 @@ int main(int argc, char *argv[]) {
     // Calculate buffer size based on totalMem
     int bufferSize = (totalMem - 12 * totalPartitions) / (8 * (totalPartitions + 1));
 
-    /* Phase 2 
-    FILE * outputFile;
-    if (! (outputFile = fopen(TEMP_FILE, "r")) ) {
-        printf("Failed to open sorted file to write to\n");
+    /* Phase 2 */
+    FILE * outputFP;
+    if (! (outputFP = fopen("edges_sorted.dat", "w")) ) {
+        printf("Failed to open file to write to\n");
         return -1;
     }
 
-    blockSize -= blockSize % sizeof(Record);
-    int blockRecords = blockSize / sizeof(Record);
-
-    Record * heap = (Record *) calloc(totalPartitions, sizeof(Record));
-    Record * outputBuffer = (Record *) calloc(blockRecords, sizeof(Record));
+    HeapRecord * heap = (HeapRecord *) calloc(totalPartitions, sizeof(HeapRecord));
+    Record * outputBuffer = (Record *) calloc(bufferSize, sizeof(Record));
     MergeManager mergeManager = {
         heap,
         0,
         totalPartitions,
-        0,
-        outputFile,
+        NULL,
+        outputFP,
         outputBuffer,
         0,
-        blockRecords,
-        0
+        bufferSize,
+        NULL
     };
-
+    mergeRuns(&mergeManager);
     free(heap);
-    fclose(inputFile);
-    fclose(outputFile);
-    */
+    free(outputBuffer);
+    fclose(outputFP);
 
     return 0;
 }

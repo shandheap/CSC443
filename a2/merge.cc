@@ -13,7 +13,7 @@ int makeRun (SortingManager manager, int run_id) {
     char filename[17];
     snprintf(filename, sizeof(filename), "temp%d.dat", run_id);
 
-    if (! (outputFile = fopen(filename, "a")) ) {
+    if (! (outputFile = fopen(filename, "w")) ) {
         printf("Failed to open file %s\n", filename);
         return -1;
     }
