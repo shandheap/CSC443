@@ -41,8 +41,8 @@ int mergeRuns (MergeManager *merger) {
      
     //2. Initialize heap with 1 element from each buffer
     if (initHeap(merger))
-        return 1;   
-     
+        return 1;
+
     while (merger->heapSize > 0) { //heap is not empty  
         HeapRecord smallest;
   

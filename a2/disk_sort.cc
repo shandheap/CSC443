@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) {
     fclose(inputFile);
     free(partitionBuffer);
 
+    // Calculate buffer size based on totalMem
+    int bufferSize = (totalMem - 12 * totalPartitions) / (8 * (totalPartitions + 1));
+
     /* Phase 2 
     FILE * outputFile;
     if (! (outputFile = fopen(TEMP_FILE, "r")) ) {
