@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) { 
     if (argc != 2) {
-        printf("Usage: print_dat <input_file>\n");
+        printf("Usage: check_dat <input_file>\n");
         return -1;
     }
 
