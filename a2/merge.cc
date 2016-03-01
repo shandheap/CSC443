@@ -270,14 +270,11 @@ int addToOutputBuffer(MergeManager *merger, Record * newRecord) {
 
 int flushOutputBuffer(MergeManager *merger) {
     Record * outputBuffer = merger->outputBuffer;
-    int outputBufferCapacity = merger->outputBufferCapacity;
     FILE * outputFP = merger->outputFP;
-
     int size;
-    size = fwrite(outputBuffer, sizeof(Record), outputBufferCapacity, outputFP);
-    if (size != outputBufferCapacity) return -1;
-
-    merger->currentPositionInOutputBuffer = 0;
-
+    size = fwrite(outputBuffer, sizeof(Record), merger->currentPositionInOutputBuffer, outputFP);
+    if (size != merger->currentPositionInOutputBuffer) return -1;
+    merger->currentPositionInOutputBuffer = 0;  
+    
     return 0;
 }

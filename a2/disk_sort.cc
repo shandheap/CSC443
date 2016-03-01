@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     mergeRuns(&mergeManager);
     free(heap);
     free(outputBuffer);
-    fclose(outputFP);
+    fclose(outputFP); 
 
     return 0;
 }
