@@ -28,15 +28,19 @@
 *.app
 
 # Compiled files
+
+# A1
 write_blocks
 write_lines
 max_ave_seq_disk
 max_ave_seq_ram
 max_ave_rand_disk
 max_ave_rand_ram
-max_average
 
+# A2
 disk_sort
+check_dat
+max_average
 
 # Output files
 records.dat
