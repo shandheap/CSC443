@@ -49,6 +49,7 @@ records.txt
 # Big files
 edges.csv
 edges.dat
+edges_sorted.dat
 
 # Temporary files
 temp*.dat
