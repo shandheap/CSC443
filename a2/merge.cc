@@ -80,6 +80,14 @@ int mergeRuns (MergeManager *merger) {
             return 1;
     }
 
+    // free allocated memory
+    for (int i = 0; i < merger->heapCapacity; i++) {
+        free(merger->inputBuffers[i].buffer);
+    }
+
+    free(merger->inputBuffers);
+    free(merger->heap);
+
     return 0;
 }
 
@@ -167,10 +175,8 @@ int refillBuffer(MergeManager *merger, int run_id) {
     // Read records drom disk and fill the inputBuffer with them
     int rec_rem_to_read =  bufferToRefill->runLength - (int) (bufferToRefill->currPositionInFile / sizeof(Record));
     int rec_to_read = (bufferToRefill->capacity > rec_rem_to_read) ? rec_rem_to_read : bufferToRefill->capacity;
-    Record *buffer = (Record *) calloc(rec_to_read, sizeof(Record));
     fseek(inputFile, bufferToRefill->currPositionInFile, SEEK_SET); // Set the filepointer to bufferToRefill->currPositionInFile
-    fread(buffer, sizeof(Record), rec_to_read, inputFile);
-    bufferToRefill->buffer = buffer;
+    fread(bufferToRefill->buffer, sizeof(Record), rec_to_read, inputFile);
     // Set the total element in bufferToRefill
     bufferToRefill->totalElements = (long) rec_to_read;
     // Reset the currentBufferPosition to 0

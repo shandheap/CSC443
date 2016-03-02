@@ -66,10 +66,9 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    HeapRecord * heap = (HeapRecord *) calloc(totalPartitions, sizeof(HeapRecord));
     Record * outputBuffer = (Record *) calloc(bufferSize, sizeof(Record));
     MergeManager mergeManager = {
-        heap,
+        0,
         0,
         totalPartitions,
         NULL,
@@ -79,9 +78,11 @@ int main(int argc, char *argv[]) {
         bufferSize,
         NULL
     };
+    
     mergeRuns(&mergeManager);
-    free(heap);
+
     free(outputBuffer);
+
     fclose(outputFP); 
 
     return 0;
