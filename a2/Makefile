@@ -9,7 +9,7 @@ library.o: library.cc library.h
 merge.o: merge.cc merge.h
 	$(CC) -o merge.o -c merge.cc
 
-max_average: max_average.cc library.o
+max_ave_followers: max_ave_followers.cc library.o
 	$(CC) -o $@ $< library.o -g
 
 disk_sort: disk_sort.cc library.o merge.o
