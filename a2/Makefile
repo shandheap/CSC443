@@ -16,4 +16,4 @@ disk_sort: disk_sort.cc library.o merge.o
 	$(CC) -o $@ $< library.o merge.o
 
 clean:
-	rm $(all_progs)
+	rm $(all_progs) *.o
