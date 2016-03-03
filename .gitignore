@@ -40,7 +40,7 @@ max_ave_rand_ram
 # A2
 disk_sort
 check_dat
-max_average
+max_ave_followers
 
 # Output files
 records.dat
